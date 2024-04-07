@@ -459,15 +459,15 @@ namespace ImGuiScene
             var io = ImGui.GetIO();
             if (!io.WantTextInput)
             {
-                for (int i = (int)ImGuiKey.NamedKey_BEGIN; i < (int)ImGuiKey.NamedKey_END; i++) {
-                    // Skip raising modifier keys if the game is focused.
+                var isForegroundWindow = User32.GetForegroundWindow() == _hWnd;
+                for (var key = ImGuiKey.NamedKey_BEGIN; key < ImGuiKey.NamedKey_END; key++) {
+                    // Skip releasing modifier keys if the game is focused.
                     // This allows us to raise the keys when one is held and the window becomes unfocused,
                     // but if we do not skip them, they will only be held down every 4th frame or so.
-                    if (User32.GetForegroundWindow() == this._hWnd &&
-                        (IsGamepadKey((ImGuiKey) i) ||
-                        IsModKey((ImGuiKey) i)))
+                    if (isForegroundWindow && (IsGamepadKey(key) || IsModKey(key)))
                         continue;
-                    io.AddKeyEvent((ImGuiKey) i, false);
+                    if (ImGui.IsKeyDown(key))
+                        io.AddKeyEvent(key, false);
                 }
             }
         }
