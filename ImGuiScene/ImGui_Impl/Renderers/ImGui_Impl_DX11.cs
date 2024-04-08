@@ -45,6 +45,7 @@ namespace ImGuiScene
         private VertexBufferBinding _vertexBinding;
         // so we don't make a temporary object every frame
         private RawColor4 _blendColor = new RawColor4(0, 0, 0, 0);
+        private ShaderResourceView _textureSrv = new(IntPtr.Zero);
 
         // TODO: I'll clean this up better later
         private class StateBackup : IDisposable
@@ -439,8 +440,8 @@ namespace ImGuiScene
                         // Bind texture, Draw
                         // TODO: might be nice to store samplers for loaded textures so that we can look them up and apply them here
                         // rather than just always using the font sampler
-                        var textureSrv = ShaderResourceView.FromPointer<ShaderResourceView>(pcmd.TextureId);
-                        _deviceContext.PixelShader.SetShaderResource(0, textureSrv);
+                        _textureSrv.NativePointer = pcmd.TextureId;
+                        _deviceContext.PixelShader.SetShaderResource(0, _textureSrv);
                         _deviceContext.DrawIndexed((int)pcmd.ElemCount, (int)(pcmd.IdxOffset + indexOffset), (int)(pcmd.VtxOffset + vertexOffset));
                     }
                 }
