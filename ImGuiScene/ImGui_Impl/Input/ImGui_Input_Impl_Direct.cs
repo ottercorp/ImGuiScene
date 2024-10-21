@@ -5,6 +5,7 @@ using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using PInvoke;
+using System.Text;
 
 namespace ImGuiScene
 {
@@ -132,7 +133,10 @@ namespace ImGuiScene
                     Marshal.FreeHGlobal(_iniPathPtr);
                 }
 
-                _iniPathPtr = Marshal.StringToHGlobalAnsi(iniPath);
+                // UTF-8 Support
+                var bytes = Encoding.UTF8.GetBytes(iniPath);
+                _iniPathPtr = Marshal.AllocHGlobal(bytes.Length);
+                Marshal.Copy(bytes, 0, _iniPathPtr, bytes.Length);
                 unsafe
                 {
                     ImGui.GetIO().NativePtr->IniFilename = (byte*)_iniPathPtr.ToPointer();
