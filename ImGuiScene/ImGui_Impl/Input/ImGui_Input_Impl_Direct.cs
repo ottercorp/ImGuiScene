@@ -134,10 +134,10 @@ namespace ImGuiScene
                 }
 
                 // ImGUI expects its filenames to be in UTF-8 format, so let's normalize and convert.
-                var utf8Bytes = Encoding.UTF8.GetBytes(iniPath);
-                this._iniPathPtr = Marshal.AllocHGlobal(utf8Bytes.Length + 1);
+                var utf8Bytes = Encoding.UTF8.GetBytes(iniPath + "\0");
+                this._iniPathPtr = Marshal.AllocHGlobal(utf8Bytes.Length);
                 Marshal.Copy(utf8Bytes, 0, this._iniPathPtr, utf8Bytes.Length);
-                
+
                 ImGui.GetIO().NativePtr->IniFilename = (byte*)this._iniPathPtr.ToPointer();
             }
         }
