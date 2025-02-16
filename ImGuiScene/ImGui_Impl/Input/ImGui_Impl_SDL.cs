@@ -128,10 +128,10 @@ namespace ImGuiScene
                     Marshal.FreeHGlobal(_iniPathPtr);
                 }
 
-                // UTF-8 Support
-                var bytes = Encoding.UTF8.GetBytes(iniPath);
-                _iniPathPtr = Marshal.AllocHGlobal(bytes.Length);
-                Marshal.Copy(bytes, 0, _iniPathPtr, bytes.Length);
+                var utf8Bytes = Encoding.UTF8.GetBytes(iniPath + "\0");
+                this._iniPathPtr = Marshal.AllocHGlobal(utf8Bytes.Length);
+                Marshal.Copy(utf8Bytes, 0, this._iniPathPtr, utf8Bytes.Length);
+
                 unsafe
                 {
                     ImGui.GetIO().NativePtr->IniFilename = (byte*)_iniPathPtr.ToPointer();

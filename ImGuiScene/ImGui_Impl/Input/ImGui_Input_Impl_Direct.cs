@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
+using System.Text;
 using PInvoke;
 using System.Text;
 
@@ -133,15 +134,12 @@ namespace ImGuiScene
                     Marshal.FreeHGlobal(_iniPathPtr);
                 }
 
-                // UTF-8 Support
-                var bytes = Encoding.UTF8.GetBytes(iniPath);
-                _iniPathPtr = Marshal.AllocHGlobal(bytes.Length + 1);
-                Marshal.Copy(bytes, 0, _iniPathPtr, bytes.Length);
-                Marshal.WriteByte(_iniPathPtr,bytes.Length,0);
-                unsafe
-                {
-                    ImGui.GetIO().NativePtr->IniFilename = (byte*)_iniPathPtr.ToPointer();
-                }
+                // ImGUI expects its filenames to be in UTF-8 format, so let's normalize and convert.
+                var utf8Bytes = Encoding.UTF8.GetBytes(iniPath + "\0");
+                this._iniPathPtr = Marshal.AllocHGlobal(utf8Bytes.Length);
+                Marshal.Copy(utf8Bytes, 0, this._iniPathPtr, utf8Bytes.Length);
+
+                ImGui.GetIO().NativePtr->IniFilename = (byte*)this._iniPathPtr.ToPointer();
             }
         }
 
